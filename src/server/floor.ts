@@ -9,6 +9,7 @@ import { excludeFromGit } from './config.js';
 import { agentProviders, configuredProvider } from './agents.js';
 import { WorkerManager, workedMs, type HookEnv, type RunAs } from './workers.js';
 import { GitHub, MergeWatch } from './github.js';
+import { JiraBoard } from './jira.js';
 import type { GhAs } from './signins.js';
 import { TaskQueue } from './queue.js';
 import { Changes } from './changes.js';
@@ -114,6 +115,8 @@ export class Floor {
   readonly project: ProjectInfo;
   readonly workers: WorkerManager;
   readonly github: GitHub;
+  /** A Jira Cloud project connected to this floor, when an admin has set one. */
+  readonly jira: JiraBoard;
   readonly queue: TaskQueue;
   readonly changes: Changes;
   readonly decor: Decor;
@@ -207,6 +210,7 @@ export class Floor {
     );
     this.workers.wing = () => this.plan.wing;
 
+    this.jira = new JiraBoard(def.dir, (state) => ctx.emit(this, { t: 'jira.issues', state }));
     this.github = new GitHub(
       def.dir,
       (state) => ctx.emit(this, { t: 'gh.issues', state }),
@@ -311,9 +315,11 @@ export class Floor {
     this.ready = this.workers.start();
 
     void this.github.refresh();
+    if (this.jira.configured) void this.jira.refresh();
     // A floor with people on it, or work under way, keeps its boards fresh; the others check in now and then.
     this.timer = setInterval(() => {
       if (this.active() || Date.now() - this.github.issues.fetchedAt > IDLE_REFRESH_MS) void this.github.refresh();
+      if (this.jira.configured && (this.active() || Date.now() - this.jira.state.fetchedAt > IDLE_REFRESH_MS)) void this.jira.refresh();
     }, REFRESH_MS);
   }
 
@@ -383,6 +389,7 @@ export class Floor {
   /** Someone just walked in: boards that haven't been looked at in a while get fetched again. */
   arrived() {
     if (Date.now() - Math.max(this.github.issues.fetchedAt, this.github.pulls.fetchedAt) > REFRESH_MS) void this.github.refresh();
+    if (this.jira.configured && Date.now() - this.jira.state.fetchedAt > REFRESH_MS) void this.jira.refresh();
   }
 
   private active(): boolean {

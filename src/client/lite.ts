@@ -17,6 +17,7 @@ import { openTerminal, openTerminalFor, routeTerminalMessage } from './ui/termin
 import { openChanges, openChangesFor, routeChangesMessage } from './ui/changes';
 import { lostWorktreeDialog, openPrompt, routeWorktreeMessage, sendHomeDialog } from './ui/prompt';
 import { openBoard } from './ui/boards';
+import { openJiraBoard } from './ui/jira';
 import type { BoardActions } from './ui/github/prompts';
 import { openPull, routePullMessage } from './ui/pull';
 import { openQueue } from './ui/queue';
@@ -318,6 +319,7 @@ function showMeeting(preset?: MeetingPreset) {
 }
 
 $('btn-issues').addEventListener('click', () => openBoard('issues', net, boardActions()));
+$('btn-jira').addEventListener('click', () => openJiraBoard(net));
 $('btn-pulls').addEventListener('click', () => openBoard('pulls', net, boardActions()));
 $('btn-queue').addEventListener('click', () => openQueue(net, { openTerminal: openWorker }));
 $('btn-new').addEventListener('click', () => sendToWorker('✨ New task'));
@@ -325,10 +327,12 @@ $('btn-new').addEventListener('click', () => sendToWorker('✨ New task'));
 function renderNav() {
   const count = (id: string, n: number) => ($(id).querySelector('.n')!.textContent = n ? String(n) : '');
   count('btn-issues', store.issues.items.filter((i) => i.state === 'OPEN').length);
+  count('btn-jira', store.jira.items.filter((i) => i.category !== 'done').length);
   count('btn-pulls', store.pulls.items.filter((p) => p.state === 'OPEN').length);
   count('btn-queue', store.queue.tasks.filter((t) => t.status !== 'done').length);
 }
 store.on('issues', renderNav);
+store.on('jira', renderNav);
 store.on('pulls', renderNav);
 store.on('queue', renderNav);
 
