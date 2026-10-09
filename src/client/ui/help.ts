@@ -43,4 +43,5 @@ export const HELP_ROWS: readonly (readonly [string, string])[] = [
   ['Esc', 'Close any window and get back to looking around'],
   ['Ctrl + [', 'Send Esc to a terminal instead, to close a menu like Claude’s /skills or interrupt Claude. ⎋ Esc in the terminal’s header does the same'],
   ['⚙️', 'Settings (in the ☰ menu): switch between first and third person'],
+  ['🥽', 'Enter VR: with a headset on a WebXR browser, the “Enter VR” button (bottom left) drops you into the office in first person. Your head looks around; WASD still walks you, wherever you’re facing is forward'],
 ];
