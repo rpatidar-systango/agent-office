@@ -18,6 +18,7 @@ import type { Parts } from './core/parts';
 import { createScene, fitWindow, installSky, makeRenderer, noWebGL } from './core/scene';
 import { createWorlds } from './core/worlds';
 import { frameLoop, installLoop } from './core/loop';
+import { installVr } from './features/vr';
 import { installPlace } from './core/place';
 import { installYou, makeMe, makeSmoke, makeSound } from './core/you';
 import { installTravel } from './core/travel';
@@ -118,6 +119,7 @@ parts.place.placeInCar();
 parts.player.view = parts.settings.view;
 parts.hands = new Hands(store.profile.color, parts.me.skinColor);
 parts.you = installYou(ctx);
+installVr(ctx);
 parts.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 ({ smoke: parts.smoke, puff: parts.puff } = makeSmoke(ctx));
 parts.sound = makeSound(parts.settings);
@@ -187,7 +189,7 @@ const frame = frameLoop(ctx, loading);
 // ---- Boot ------------------------------------------------------------------------------------------
 function boot() {
   parts.net.connect();
-  requestAnimationFrame(frame);
+  ctx.renderer.setAnimationLoop(frame);
 }
 
 /** Who you're signed in as. With an account of your own, your name is that account's. */
@@ -226,7 +228,7 @@ void whoami().then(() => {
     // Pick a character first (people from before there was a choice keep their name and color).
     if (saved) Object.assign(store.profile, { name: saved.name, color: saved.color });
     // Render the office behind the character select screen.
-    requestAnimationFrame(frame);
+    ctx.renderer.setAnimationLoop(frame);
     openCharacter(true, (p) => {
       parts.you.showMyProfile(p);
       parts.net.connect();

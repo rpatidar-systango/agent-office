@@ -100,6 +100,8 @@ export function installSky(ctx: Ctx) {
 /** The canvas and the camera (and your hands' own camera) fit the window, and keep fitting it. */
 export function fitWindow(ctx: Ctx) {
   function resize() {
+    // In VR the headset owns the drawing buffer's size; leave it be until the flat page is back.
+    if (ctx.renderer.xr.isPresenting) return;
     const w = window.innerWidth;
     const hgt = window.innerHeight;
     ctx.renderer.setSize(w, hgt, false);

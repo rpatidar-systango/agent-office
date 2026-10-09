@@ -1,0 +1,6 @@
+/* The WebXR "Enter VR" button, tucked bottom-left so it clears the hint bar and the center HUD. */
+#vrButton {
+  bottom: 16px !important;
+  left: 16px !important;
+  right: auto !important;
+}

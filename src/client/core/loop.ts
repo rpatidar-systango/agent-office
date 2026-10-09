@@ -48,8 +48,9 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
   /** Frames coming too slowly for the 3D to be any fun: the 2D view is offered. */
   const slowFrames = new SlowFrames();
 
-  /** Frames coming too slowly for the 3D to be any fun: the 2D view is offered. */
+  /** Frames coming too slowly for the 3D to be any fun: the 2D view is offered (never while in VR). */
   function watchFrameRate({ now, delta }: Frame) {
+    if (ctx.renderer.xr.isPresenting) return;
     if (slowFrames.frame(now, delta * 1000)) deps.offer2d('slow');
   }
 
@@ -97,7 +98,8 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     // What you're doing widens the view (down a pole) or narrows it (at the oche or the line), and once
     // it's set, may take it over (the telescope) or streak its edges (down a pole): see ctx.view.
     const fov = ctx.view.fov(FOV);
-    if (Math.abs(camera.fov - fov) > 0.05) {
+    // In VR each eye carries its own projection; leave the flat camera's field of view be.
+    if (!ctx.renderer.xr.isPresenting && Math.abs(camera.fov - fov) > 0.05) {
       camera.fov += (fov - camera.fov) * Math.min(1, dt * 8);
       camera.updateProjectionMatrix();
     }
@@ -183,13 +185,23 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
 
   /** Draws the frame, through whatever it's drawn through (a few drinks in, the drunk vision: see ctx.view). */
   function drawFrame(f: Frame) {
-    ctx.view.draw(f, drawScene);
+    // In VR the screen-filter passes (the drunk vision) have no place: draw straight to both eyes.
+    if (ctx.renderer.xr.isPresenting) drawScene();
+    else ctx.view.draw(f, drawScene);
   }
 
   /** The scene, then your hands on top of it. */
   function drawScene() {
     const { player, hands, sky, camera, renderer } = ctx;
     const { effect, scene } = parts.stage;
+    // In VR the renderer draws both eyes itself; no toon outline pass, no hands overlay (they can't
+    // ride a second camera through the headset). Your body below you is still hidden from your own view.
+    if (renderer.xr.isPresenting) {
+      const back = firstBody?.hideExtras();
+      renderer.render(scene, camera);
+      back?.();
+      return;
+    }
     const firstPerson = player.view === 'first';
     const unhide = firstBody?.hideExtras();
     effect.render(scene, camera);
@@ -209,7 +221,8 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
 
 /**
  * The frame loop: each frame, every phase's ticks, in order (see TICK_PHASES, and installLoop). Its
- * clock starts now; hand what it returns to requestAnimationFrame to start it.
+ * clock starts now; hand what it returns to `renderer.setAnimationLoop` to start it — that keeps it
+ * driving both the flat page (requestAnimationFrame under the hood) and a headset's own frame clock.
  */
 export function frameLoop(ctx: Ctx, loading: { drew(): void }): (ts?: number) => void {
   const timer = new THREE.Timer();
@@ -218,7 +231,6 @@ export function frameLoop(ctx: Ctx, loading: { drew(): void }): (ts?: number) =>
     const delta = timer.getDelta();
     ctx.ticks.run({ delta, dt: Math.min(delta, 0.1), t: timer.getElapsed(), now: performance.now() });
     loading.drew();
-    requestAnimationFrame(frame);
   }
   return frame;
 }
