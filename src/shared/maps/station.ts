@@ -94,6 +94,8 @@ export const STATION: MapConfig = {
     queue: { x: -WALL_X, y: 3.3, z: BOARDS_Z[1], rotY: Math.PI / 2, width: 4.4, height: 2.6, label: '📋 Mission queue' },
     pulls: { x: WALL_X, y: 3.3, z: BOARDS_Z[0], rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🔀 Docking requests' },
     services: { x: WALL_X, y: 3.3, z: BOARDS_Z[1], rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🌐 Subsystems' },
+    // Starboard, between the rib at z 1.5 and the window at z 7.
+    jira: { x: WALL_X, y: 2.2, z: 2.95, rotY: -Math.PI / 2, width: 1.7, height: 2.72, label: '🗂️ Jira' },
   },
   props,
   agents: { outfit: 'none', ageMinutes: 0 },

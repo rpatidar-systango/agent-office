@@ -102,7 +102,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
     out.push({ icon: '🔎', kind: 'Action', title: 'Search the chat and every terminal', keywords: ['find'], open: showSearch });
 
     out.push(at('issues', 'the Issues board', { icon: '📌', kind: 'Board', title: 'Issues board', open: () => openBoard('issues', net, actions.boardActions()) }));
-    out.push({ icon: '🗂️', kind: 'Board', title: 'Jira board', detail: store.jira.config.project, keywords: ['jira', 'atlassian'], open: () => openJiraBoard(net) });
+    out.push(at('jira', 'the Jira board', { icon: '🗂️', kind: 'Board', title: 'Jira board', detail: store.jira.config.project, keywords: ['jira', 'atlassian'], open: () => openJiraBoard(net) }));
     out.push(at('pulls', 'the PR board', { icon: '🔀', kind: 'Board', title: 'PR board', keywords: ['pull requests'], open: () => openBoard('pulls', net, actions.boardActions()) }));
     out.push(at('services', 'the Services board', { icon: '🌐', kind: 'Board', title: 'Services board', detail: 'Web servers the workers are running', open: () => openServices() }));
     out.push(at('whiteboard', 'the whiteboard', { icon: '📝', kind: 'Board', title: 'Whiteboard', open: () => openWhiteboard(net) }));

@@ -108,6 +108,7 @@ export const CASTLE: MapConfig = {
     queue: { x: -WALL_X, y: 3.5, z: -3, rotY: Math.PI / 2, width: 4.4, height: 2.6, label: '📋 Orders of the day' },
     pulls: { x: WALL_X, y: 3.5, z: -15, rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🔀 Decrees for the seal' },
     services: { x: WALL_X, y: 3.5, z: -3, rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🌐 Services' },
+    jira: { x: WALL_X, y: 2.15, z: 9, rotY: -Math.PI / 2, width: 1.9, height: 3.04, label: '🗂️ Jira' },
   },
   props,
   agents: { outfit: 'peasant', ageMinutes: 30 },

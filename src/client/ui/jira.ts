@@ -87,7 +87,9 @@ export function openJiraBoard(net: Net) {
         style: `--tilt:${TILTS[i % TILTS.length]};background:${NOTE_COLORS[i % NOTE_COLORS.length]}`,
         tabindex: 0,
         onclick: open,
-        onkeydown: ((e: KeyboardEvent) => e.key === 'Enter' && e.target === e.currentTarget && open()) as EventListener,
+        onkeydown: (e: Event) => {
+          if (e instanceof KeyboardEvent && e.key === 'Enter' && e.target === e.currentTarget) open();
+        },
       },
       h('div.num', {}, it.key),
       h('div.ttl', {}, it.title),
