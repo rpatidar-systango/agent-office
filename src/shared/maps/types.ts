@@ -17,8 +17,8 @@ export const MAP_STYLES = ['castle', 'station'] as const;
 export type MapStyle = (typeof MAP_STYLES)[number];
 
 /** The boards on the walls. */
-export type BoardKey = 'issues' | 'queue' | 'pulls' | 'services';
-export const BOARD_KEYS: readonly BoardKey[] = ['issues', 'queue', 'pulls', 'services'];
+export type BoardKey = 'issues' | 'queue' | 'pulls' | 'services' | 'jira';
+export const BOARD_KEYS: readonly BoardKey[] = ['issues', 'queue', 'pulls', 'services', 'jira'];
 
 /** Somewhere on the floor, facing `rotY` (0 is +z, π/2 is +x). */
 export interface Place {

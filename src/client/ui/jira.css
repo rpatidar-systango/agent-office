@@ -1,0 +1,6 @@
+.jira-setup { margin: auto; width: min(480px, 100%); background: var(--paper); border: 3px solid var(--ink); border-radius: 14px; padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; }
+.jira-setup h3 { margin: 0; font-size: 18px; }
+.jira-setup p, .jira-setup small { margin: 0; color: var(--muted); font-weight: 700; font-size: 13px; line-height: 1.45; }
+.modal .jira-setup label { display: flex; flex-direction: column; gap: 4px; margin: 0; font-size: 13px; }
+.jira-setup .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.jira-setup .err { color: var(--bad); font-weight: 800; }

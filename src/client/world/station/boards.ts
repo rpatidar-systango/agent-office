@@ -4,7 +4,7 @@ import type { Interactable } from '../types';
 import { mesh, textPlane } from '../toon';
 import { box, type Kit } from './kit';
 
-/** The four boards: big displays on the walls, a line of light round each and its name over it. */
+/** The boards: big displays on the walls, a line of light round each and its name over it. */
 export function buildBoards(kit: Kit): Record<BoardKey, THREE.Mesh> {
   const { mats } = kit;
   const faces = {} as Record<BoardKey, THREE.Mesh>;

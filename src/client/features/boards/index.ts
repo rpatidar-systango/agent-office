@@ -9,12 +9,13 @@ import type { Ctx } from '../../core/context';
 import { aside, boardHint, hintTitle, key, onE } from '../../core/hint';
 import { store, type Topic } from '../../state';
 import { openBoard } from '../../ui/boards';
+import { openJiraBoard } from '../../ui/jira';
 import { inProgress } from '../../ui/github/progress';
 import type { BoardActions } from '../../ui/github/prompts';
 import { clip } from '../../ui/dom';
 import { openIssue } from '../../ui/pull';
 import { openServices } from '../../ui/services';
-import { BoardTexture, QueueBoardTexture, ServicesBoardTexture } from './world';
+import { BoardTexture, JiraBoardTexture, QueueBoardTexture, ServicesBoardTexture } from './world';
 import { MachineTexture } from './machine';
 import { MeetingBoardTexture, MeetingSignTexture } from './meeting';
 import type { World } from '../../world/world';
@@ -26,6 +27,7 @@ declare module '../../world/types' {
     pulls: true;
     services: true;
     queue: true;
+    jira: true;
   }
 }
 
@@ -100,6 +102,8 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
   const queueTex = new QueueBoardTexture();
   const renderQueueBoard = () => queueTex.render(store.queue, store.workers);
   mountBoard(office.boardMeshes.queue, queueTex.texture, renderQueueBoard, ['queue', 'workers']);
+  const jiraTex = new JiraBoardTexture();
+  mountBoard(office.boardMeshes.jira, jiraTex.texture, () => jiraTex.render(store.jira), ['jira']);
   ctx.interactions.define('issues', {
     reach: 9,
     hint: () => {
@@ -124,6 +128,11 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     hint: () => boardHint('🌐 Services board'),
     use: onE(() => openServices()),
   });
+  ctx.interactions.define('jira', {
+    reach: 9,
+    hint: () => boardHint('🗂️ Jira board'),
+    use: onE(() => openJiraBoard(ctx.net)),
+  });
   ctx.interactions.define('queue', {
     reach: 9,
     hint: () => {
@@ -146,6 +155,7 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     showOn(w.boardMeshes.pulls, pullsTex.texture);
     showOn(w.boardMeshes.services, servicesTex.texture);
     showOn(w.boardMeshes.queue, queueTex.texture);
+    showOn(w.boardMeshes.jira, jiraTex.texture);
     if (w.meetingBoard) showOn(w.meetingBoard, meetingBoardTex.texture);
     if (w.meetingSign) showOn(w.meetingSign, meetingSignTex.texture);
   }

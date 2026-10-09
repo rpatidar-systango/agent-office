@@ -251,6 +251,8 @@ export const BOARDS = {
   pulls: { x: 3.9, y: 2.1, z: FLOOR.minZ + 0.08, rotY: 0, width: 6, height: 3, label: 'Pull Requests' },
   // East wall, north of the lounge TV.
   services: { x: FLOOR.maxX - 0.08, y: 2.1, z: -8.2, rotY: -Math.PI / 2, width: 6, height: 3, label: '🌐 Services' },
+  // East wall, in the gap between the services board and the lounge TV.
+  jira: { x: FLOOR.maxX - 0.08, y: 2.05, z: -4.2, rotY: -Math.PI / 2, width: 1.28, height: 2.05, label: '🗂️ Jira' },
 } as const;
 
 /** The big TV on the east wall that shows whoever is screen sharing. */

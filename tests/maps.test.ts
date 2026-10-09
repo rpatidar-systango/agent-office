@@ -60,6 +60,15 @@ test('in the castle every worker can walk from its seat to the door and to the f
   assert.ok(seatHereOn(OFFICE_PLAN, 'couch:0', false));
 });
 
+test('a map that leaves out the Jira board gets one beside the services board', () => {
+  const boards = { ...CASTLE.boards } as Partial<typeof CASTLE.boards>;
+  delete boards.jira;
+  const plan = planMap({ ...CASTLE, id: 'nojira', name: 'No jira', boards });
+  assert.equal(plan.boards.jira.x, CASTLE.boards.services.x);
+  assert.ok(plan.boards.jira.z > CASTLE.boards.services.z);
+  assert.equal(plan.boards.jira.label, '🗂️ Jira');
+});
+
 test('a custom map extends a built-in one, changing only what it gives', () => {
   const [mine] = checkCustomMaps([{ file: 'mine.json', json: { id: 'mine', name: 'My hall', extends: 'castle', boards: { issues: { z: -21 } }, lineup: { count: 3 } } }]);
   assert.equal(mine.error, undefined);

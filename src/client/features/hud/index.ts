@@ -12,6 +12,7 @@ import { waitingInOrder, waitingLabel } from '../../nextup';
 import { saveSettings, store } from '../../state';
 import { openAccounts } from '../../ui/accounts';
 import { openBoard } from '../../ui/boards';
+import { openJiraBoard } from '../../ui/jira';
 import { openCharacter } from '../../ui/character';
 import { $ } from '../../ui/dom';
 import { toggleFloorMenu } from '../../ui/floormenu';
@@ -50,6 +51,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
   const hud = mountHud(
     [
       { id: 'issues', icon: '📌', label: 'Issues', section: 'Open', count: () => store.issues.items.filter((i) => i.state === 'OPEN').length, run: () => openBoard('issues', net, actions.boardActions()) },
+      { id: 'jira', icon: '🗂️', label: 'Jira', section: 'Open', count: () => store.jira.items.filter((i) => i.category !== 'done').length, title: () => (store.jira.config.configured ? `${store.jira.config.project} on Jira` : 'Connect a Jira Cloud project'), run: () => openJiraBoard(net) },
       { id: 'pulls', icon: '🔀', label: 'Pull requests', section: 'Open', count: () => store.pulls.items.filter((p) => p.state === 'OPEN').length, run: () => openBoard('pulls', net, actions.boardActions()) },
       { id: 'queue', icon: '📋', label: 'Task queue', section: 'Open', count: () => store.queue.tasks.filter((t) => t.status !== 'done').length, title: () => 'Issues and tasks waiting for a worker', run: waiting.showQueue },
       { id: 'services', icon: '🌐', label: 'Services', section: 'Open', count: () => store.services.items.length, title: () => 'Web servers the workers are running', run: () => openServices() },

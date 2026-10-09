@@ -5,7 +5,7 @@ import { mesh, textPlane } from '../toon';
 import type { Kit } from './kit';
 import { box } from './shapes';
 
-/** The four boards, framed in wood and iron on the walls, with a painted sign over each. */
+/** The boards, framed in wood and iron on the walls, with a painted sign over each. */
 export function buildBoards(kit: Kit, plan: MapPlan): Record<BoardKey, THREE.Mesh> {
   const { mats } = kit;
   const faces = {} as Record<BoardKey, THREE.Mesh>;

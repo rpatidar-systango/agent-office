@@ -46,7 +46,30 @@ export const MAP_LIMITS = { tables: 40, seats: 12, props: 400 } as const;
 /** The dais a throne stands on when its map doesn't say. */
 export const DEFAULT_DAIS = { width: 8, depth: 4.5, height: 0.9, steps: 3 } as const;
 
-const DEFAULT_BOARD_LABEL: Record<BoardKey, string> = { issues: 'Issues', queue: '📋 Task queue', pulls: 'Pull Requests', services: '🌐 Services' };
+const DEFAULT_BOARD_LABEL: Record<BoardKey, string> = { issues: 'Issues', queue: '📋 Task queue', pulls: 'Pull Requests', services: '🌐 Services', jira: '🗂️ Jira' };
+
+/**
+ * Where a Jira board goes when a map doesn't say: beside the services board, along the wall,
+ * the other way if that would leave the hall.
+ */
+function jiraBeside(services: Record<string, unknown>, bounds: { minX: number; maxX: number; minZ: number; maxZ: number }): Record<string, unknown> | undefined {
+  const rotY = typeof services.rotY === 'number' ? services.rotY : 0;
+  const sw = typeof services.width === 'number' ? services.width : 4;
+  const width = 1.9;
+  const along = sw / 2 + width / 2 + 0.5;
+  const x0 = typeof services.x === 'number' ? services.x : 0;
+  const z0 = typeof services.z === 'number' ? services.z : 0;
+  const dx = Math.cos(rotY);
+  const dz = -Math.sin(rotY);
+  const fits = (s: number) => {
+    const x = x0 + dx * along * s;
+    const z = z0 + dz * along * s;
+    return x >= bounds.minX && x <= bounds.maxX && z >= bounds.minZ && z <= bounds.maxZ ? { x, z } : undefined;
+  };
+  const spot = fits(1) ?? fits(-1);
+  if (!spot) return undefined;
+  return { x: spot.x, y: services.y, z: spot.z, rotY, width, height: +(width / (5 / 8)).toFixed(2), label: '🗂️ Jira' };
+}
 
 // ---- The office -----------------------------------------------------------------------------------
 
@@ -244,7 +267,9 @@ export function planMap(input: unknown): MapPlan {
   if (!isObj(c.boards)) throw new MapError('it needs boards: issues, queue, pulls and services');
   const boards = {} as Record<BoardKey, BoardDef>;
   for (const k of BOARD_KEYS) {
-    const b = c.boards[k];
+    // A map written before the Jira board still loads: the board hangs beside Services.
+    let b: unknown = c.boards[k];
+    if (k === 'jira' && !isObj(b) && isObj(c.boards.services)) b = jiraBeside(c.boards.services, bounds);
     if (!isObj(b)) throw new MapError(`it needs boards.${k}: { x, y, z, rotY, width, height }`);
     boards[k] = {
       x: num(b.x, `boards.${k}.x`, bounds.minX, bounds.maxX),

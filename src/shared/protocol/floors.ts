@@ -10,6 +10,7 @@ import type { JukeboxState } from '../jukebox.js';
 import type { WhiteboardView } from '../whiteboard.js';
 import type { AgentProvider } from './agents.js';
 import type { GhIssue, GhPull, GhState } from './github.js';
+import type { JiraState } from './jira.js';
 import type { MeetingState } from './meetings.js';
 import type { PeerInfo } from './presence.js';
 import type { QueueState } from './queue.js';
@@ -102,6 +103,8 @@ export interface FloorView {
   workers: WorkerInfo[];
   issues: GhState<GhIssue>;
   pulls: GhState<GhPull>;
+  /** This floor's Jira project, when an admin has connected one. */
+  jira: JiraState;
   queue: QueueState;
   /** Pictures on this floor's walls. */
   decor: Decoration[];

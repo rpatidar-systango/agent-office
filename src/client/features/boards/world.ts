@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { GhIssue, GhPull, GhState, QueueState, QueueTask, ServiceInfo, WorkerInfo } from '../../../shared/protocol';
+import type { GhIssue, GhPull, GhState, JiraState, QueueState, QueueTask, ServiceInfo, WorkerInfo } from '../../../shared/protocol';
 import { store, workerForPull } from '../../state';
 
 export const NOTE_COLORS = ['#fff7b0', '#ffd6e0', '#caffbf', '#bde0fe', '#ffe5b4'];
@@ -388,6 +388,87 @@ export class QueueBoardTexture {
       g.textAlign = 'right';
       g.fillText(`+${rows.length - shown.length} more`, W - 44, H - 34);
       g.textAlign = 'left';
+    }
+    this.texture.needsUpdate = true;
+  }
+}
+
+/** The Jira board: cork with the issues that aren't done. One picture, hung on every map. */
+export class JiraBoardTexture {
+  readonly texture: THREE.CanvasTexture;
+  private canvas = document.createElement('canvas');
+  private ctx: CanvasRenderingContext2D;
+  private drawn = '';
+
+  constructor() {
+    this.canvas.width = 750;
+    this.canvas.height = 1200;
+    this.ctx = this.canvas.getContext('2d')!;
+    this.texture = new THREE.CanvasTexture(this.canvas);
+    this.texture.colorSpace = THREE.SRGBColorSpace;
+    this.texture.anisotropy = 8;
+  }
+
+  render(state: JiraState) {
+    const open = state.items.filter((i) => i.category !== 'done');
+    const key = JSON.stringify([state.config.configured, state.error ?? '', state.loading && !state.fetchedAt, open.map((i) => [i.key, i.title, i.category])]);
+    if (key === this.drawn) return;
+    this.drawn = key;
+    const g = this.ctx;
+    const W = this.canvas.width;
+    const H = this.canvas.height;
+    g.fillStyle = '#d8a86a';
+    g.fillRect(0, 0, W, H);
+    let seed = 11;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    for (let i = 0; i < 900; i++) {
+      g.fillStyle = rnd() > 0.5 ? 'rgba(120,70,30,.18)' : 'rgba(255,240,210,.18)';
+      g.fillRect(rnd() * W, rnd() * H, 4, 4);
+    }
+    const note = !state.config.configured
+      ? 'An admin can connect Jira from this board'
+      : state.error && !open.length
+        ? state.error
+        : state.loading && !state.fetchedAt
+          ? 'Loading…'
+          : open.length
+            ? ''
+            : 'No open issues';
+    g.textAlign = 'left';
+    g.textBaseline = 'alphabetic';
+    if (note) {
+      g.font = '800 48px Nunito, ui-rounded, system-ui, sans-serif';
+      const lines = wrap(g, note.replace(/`/g, ''), W - 140, 6);
+      const boxH = 80 + lines.length * 60;
+      g.fillStyle = '#fffaf3';
+      g.fillRect(50, H / 2 - boxH / 2, W - 100, boxH);
+      g.fillStyle = '#2b2d42';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      lines.forEach((line, i) => g.fillText(line, W / 2, H / 2 - ((lines.length - 1) * 60) / 2 + i * 60));
+      this.texture.needsUpdate = true;
+      return;
+    }
+    const shown = open.slice(0, 6);
+    const rowH = (H - 70) / shown.length;
+    shown.forEach((it, i) => {
+      const y = 36 + i * rowH;
+      const nh = rowH - 24;
+      g.fillStyle = 'rgba(0,0,0,.22)';
+      g.fillRect(58, y + 8, W - 96, nh);
+      g.fillStyle = it.category === 'progress' ? '#bde0fe' : '#fff7b0';
+      g.fillRect(48, y, W - 96, nh);
+      g.fillStyle = '#2b2d42';
+      g.font = '900 42px Nunito, ui-rounded, system-ui, sans-serif';
+      g.fillText(it.key, 72, y + 56);
+      g.font = '700 34px Nunito, ui-rounded, system-ui, sans-serif';
+      wrap(g, it.title, W - 160, 2).forEach((line, li) => g.fillText(line, 72, y + 108 + li * 42));
+    });
+    if (open.length > shown.length) {
+      g.fillStyle = '#2b2d42';
+      g.font = '800 32px Nunito, ui-rounded, system-ui, sans-serif';
+      g.textAlign = 'right';
+      g.fillText(`+${open.length - shown.length} more`, W - 36, H - 24);
     }
     this.texture.needsUpdate = true;
   }
