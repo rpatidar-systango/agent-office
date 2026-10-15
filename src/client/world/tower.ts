@@ -65,20 +65,21 @@ export function buildTower(colliders: Collider[], night: NightParts): Tower {
     m.userData.outlineParameters = { visible: false };
     return m;
   };
-  const paint = flat('#e07a5f');
-  const band = flat('#e8a87c');
-  const frame = toon('#ffffff');
+  // Crystal IT Park, Indore: a curtain-wall tower of blue-green mirror glass on silver mullions.
+  const paint = flat('#2f8ba3'); // spandrel glass between the vision glass, the same cool teal
+  const band = flat('#9fb0ba'); // the silver metal band along each slab
+  const frame = toon('#9aa8b5'); // silver-grey mullions, not white timber
   const alu = toon('#aab4be');
   const ink = toon('#3d405b');
   const wood = toon('#c98b5a');
-  const deck = toon('#e8a87c');
-  const cornice = toon('#fffaf3');
+  const deck = toon('#9fb0ba');
+  const cornice = toon('#cfd8de');
   const behind = flat('#2b2d42');
   const concrete = flat('#d3d6dd');
   // Glass you can't see into; at night some of it glows, as though someone upstairs is still at it.
-  const dark = toon('#a9d8f5');
+  const dark = toon('#4fc0d6');
   const lit = ['#ffd27a', '#ffe6b0', '#9ec9ff'].map((glow) => {
-    const m = toonUnique('#a9d8f5');
+    const m = toonUnique('#4fc0d6');
     m.emissive.set(glow);
     m.emissiveIntensity = 0;
     night.windows.push(m);
