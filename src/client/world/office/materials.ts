@@ -21,8 +21,8 @@ export const PALETTE = {
   plantDark: '#3f8f45',
   pot: '#e76f51',
   ink: '#2b2d42',
-  /** The building's outside paint. */
-  exterior: '#e07a5f',
+  /** The building's outside paint: the teal spandrel glass of the curtain wall (see world/tower.ts). */
+  exterior: '#2f8ba3',
 };
 
 /** Window glass: faintly blue and see-through. */
