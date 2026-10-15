@@ -212,6 +212,10 @@ export class PlayerController extends PlayerInput {
         diff = Math.atan2(Math.sin(diff), Math.cos(diff));
         this.facing += diff * Math.min(1, dt * 14);
       }
+    } else if (this.view === 'third' && !this.path) {
+      // Standing still, turn to face where the camera looks, as walking does, so the mouse steers you either way.
+      const diff = Math.atan2(Math.sin(this.camYaw + Math.PI - this.facing), Math.cos(this.camYaw + Math.PI - this.facing));
+      this.facing += diff * Math.min(1, dt * 14);
     }
 
     // Never below the street: past the edge of the grass there's nothing else to stand on.
