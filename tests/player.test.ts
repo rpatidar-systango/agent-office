@@ -248,3 +248,16 @@ test('a buzz on you walks you further and jumps you higher', (t) => {
   }
   assert.ok(highest[1] > highest[0] * 1.4, `jumped ${highest[1]} against ${highest[0]}`);
 });
+
+test('standing still in third person, the mouse turns you to face where the camera looks', (t) => {
+  const { player, keys, frames } = controller(t, []);
+  player.setView('third');
+  player.pos.set(0, 0, 0);
+  player.facing = 0;
+  player.camYaw = 1; // dragged the camera round while standing still
+  keys(); // no movement keys held
+  frames(60);
+  const want = player.camYaw + Math.PI;
+  const off = Math.atan2(Math.sin(player.facing - want), Math.cos(player.facing - want));
+  assert.ok(Math.abs(off) < 0.02, `facing ${player.facing} should near ${want}, off by ${off}`);
+});
